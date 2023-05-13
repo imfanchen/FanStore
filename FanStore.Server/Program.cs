@@ -24,7 +24,7 @@ List<Book> books = new() {
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 WebApplication app = builder.Build();
 
-var group = app.MapGroup("/books");
+var group = app.MapGroup("/books").WithParameterValidation();
 
 group.MapGet("/", () => books);
 
