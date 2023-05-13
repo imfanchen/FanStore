@@ -1,0 +1,46 @@
+# Require RestClient VSCode Extension:
+## FanStore API Calls
+## Author: Fan Chen
+
+### Set configs
+@hostname = localhost
+@port = 5006
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+
+
+### GET /books
+GET http://{{host}}/books
+Content-Type: {{contentType}}
+
+### POST /books
+# @name createrecord
+POST http://{{host}}/books
+Content-Type: {{contentType}}
+
+{
+    "name": "The Most Important Thing",
+    "author": "Howard Marks",
+    "price": 15.99,
+    "releaseDate": "2011-05-01T00:00:00",
+    "imageUri": "https://m.media-amazon.com/images/I/512xEVbLwXL._SX346_BO1,204,203,200_.jpg"
+}
+
+### GET /book/id
+GET http://{{host}}/books/3
+
+### DELETE /book/id
+DELETE http://{{host}}/books/3
+
+### PUT /book/id
+PUT http://{{host}}/books/3
+Content-Type: {{contentType}}
+
+{
+    "name": "The Most Important Thing",
+    "author": "Howard Marks",
+    "price": 19.99,
+    "releaseDate": "2011-05-01T00:00:00",
+    "imageUri": "https://m.media-amazon.com/images/I/512xEVbLwXL._SX346_BO1,204,203,200_.jpg"
+}
+
