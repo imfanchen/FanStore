@@ -24,9 +24,11 @@ List<Book> books = new() {
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 WebApplication app = builder.Build();
 
-app.MapGet("/books", () => books);
+var group = app.MapGroup("/books");
 
-app.MapGet("/books/{id}", (int id) => {
+group.MapGet("/", () => books);
+
+group.MapGet("/{id}", (int id) => {
     Book? item = books.Find(book => book.Id == id);
     if (item is null)
     {
@@ -35,14 +37,14 @@ app.MapGet("/books/{id}", (int id) => {
     return Results.Ok(item);
 }).WithName(GetBookEndpointName);
 
-app.MapPost("/books", (Book item) =>
+group.MapPost("/", (Book item) =>
 {
     item.Id = books.Max(book => book.Id) + 1;
     books.Add(item);
     return Results.CreatedAtRoute(GetBookEndpointName, new {id = item.Id}, item);
 });
 
-app.MapPut("/books/{id}", (int id, Book updatedBook) => 
+group.MapPut("/{id}", (int id, Book updatedBook) => 
 {
     Book? existingBook = books.Find(book => book.Id == id);
     if (existingBook is null)
@@ -57,7 +59,7 @@ app.MapPut("/books/{id}", (int id, Book updatedBook) =>
     return Results.NoContent();
 });
 
-app.MapDelete("/books/{id}", (int id) => {
+group.MapDelete("/{id}", (int id) => {
     Book? existingBook = books.Find(book => book.Id == id);
     if (existingBook is not null) 
     {

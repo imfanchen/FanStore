@@ -29,9 +29,6 @@ Content-Type: {{contentType}}
 ### GET /book/id
 GET http://{{host}}/books/3
 
-### DELETE /book/id
-DELETE http://{{host}}/books/3
-
 ### PUT /book/id
 PUT http://{{host}}/books/3
 Content-Type: {{contentType}}
@@ -44,3 +41,5 @@ Content-Type: {{contentType}}
     "imageUri": "https://m.media-amazon.com/images/I/512xEVbLwXL._SX346_BO1,204,203,200_.jpg"
 }
 
+### DELETE /book/id
+DELETE http://{{host}}/books/3
