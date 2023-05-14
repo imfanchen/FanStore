@@ -1,6 +1,6 @@
 using FanStore.Server.Entities;
+using FanStore.Server.Models;
 using FanStore.Server.Repositories;
-using Microsoft.AspNetCore.DataProtection.Repositories;
 
 namespace FanStore.Server.Endpoints;
 
@@ -11,41 +11,39 @@ public static class BooksEndpoints
 
     public static RouteGroupBuilder MapBooksEndpoints(this IEndpointRouteBuilder routes)
     {
-        InMemoryBooksRepository repository = new();
-
         var group = routes.MapGroup(GroupEndpointName).WithParameterValidation();
 
-        group.MapGet("/", () => repository.GetAll());
+        group.MapGet("/", (IBooksRepository repository) => repository.GetAll());
 
-        group.MapGet("/{id}", (int id) => {
-            Book? item = repository.Get(id);
+        group.MapGet("/{id}", (IBooksRepository repository, int id) =>
+        {
+            BookEntity? item = repository.Get(id);
             return item is not null ? Results.Ok(item) : Results.NotFound();
         }).WithName(GetEndpointName);
 
-        group.MapPost("/", (Book createdItem) =>
+        group.MapPost("/", (IBooksRepository repository, CreatedBookModel createdItem) =>
         {
-            repository.Create(createdItem);
-            return Results.CreatedAtRoute(GetEndpointName, new {id = createdItem.Id}, createdItem);
+            BookEntity item = createdItem.AsPoco();
+            repository.Create(item);
+            return Results.CreatedAtRoute(GetEndpointName, new { id = item.Id }, item);
         });
 
-        group.MapPut("/{id}", (int id, Book updatedItem) => 
+        group.MapPut("/{id}", (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {
-            Book? existingItem = repository.Get(id);
+            BookEntity? existingItem = repository.Get(id);
             if (existingItem is null)
             {
                 return Results.NotFound();
             }
-            existingItem.Name = updatedItem.Name;
-            existingItem.Author = updatedItem.Author;
-            existingItem.Price = updatedItem.Price;
-            existingItem.ReleaseDate = updatedItem.ReleaseDate;
-            existingItem.ImageUri = updatedItem.ImageUri;
+            existingItem = updatedItem.AsPoco(id);
+            repository.Update(existingItem);
             return Results.NoContent();
         });
 
-        group.MapDelete("/{id}", (int id) => {
-            Book? existingItem = repository.Get(id);
-            if (existingItem is not null) 
+        group.MapDelete("/{id}", (IBooksRepository repository, int id) =>
+        {
+            BookEntity? existingItem = repository.Get(id);
+            if (existingItem is not null)
             {
                 repository.Delete(id);
             }
