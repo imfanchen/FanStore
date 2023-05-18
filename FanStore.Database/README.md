@@ -2,7 +2,7 @@
 
 ## Starting SQL Server
 
-Run Microsoft SQL Server in a Docker Container
+Run Microsoft SQL Server in a Docker container
 
 ```powershell
 $sa_password = "<YOUR-SA-PASSWORD-GOES-HERE>"
