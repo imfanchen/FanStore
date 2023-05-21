@@ -22,14 +22,17 @@ public static class BooksEndpoints
         {
             BookEntity? item = await repository.GetAsync(id);
             return item is not null ? Results.Ok(item.AsDto()) : Results.NotFound();
-        }).WithName(GetEndpointName);
+        })
+        .WithName(GetEndpointName)
+        .RequireAuthorization();
 
         group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
         {
             BookEntity item = createdItem.AsPoco();
             await repository.CreateAsync(item);
             return Results.CreatedAtRoute(GetEndpointName, new { id = item.Id }, item);
-        });
+        })
+        .RequireAuthorization();
 
         group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {
@@ -41,7 +44,8 @@ public static class BooksEndpoints
             existingItem = updatedItem.AsPoco(id);
             await repository.UpdateAsync(existingItem);
             return Results.NoContent();
-        });
+        })
+        .RequireAuthorization();
 
         group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
         {
@@ -51,8 +55,9 @@ public static class BooksEndpoints
                 await repository.DeleteAsync(id);
             }
             return Results.NoContent();
-        });
-
+        })
+        .RequireAuthorization();
+        
         return group;
     }
 }

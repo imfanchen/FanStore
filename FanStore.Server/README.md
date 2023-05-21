@@ -31,3 +31,12 @@ dotnet ef migrations add InitialCreation --output-dir Data\Migrations
 ```powershell
 dotnet ef database update
 ```
+
+## Add Access Token
+```powershell
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+
+dotnet user-jwts create
+
+dotnet user-jwts print <previous-generated-jwt-id>
+```
