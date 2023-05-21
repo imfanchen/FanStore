@@ -32,7 +32,9 @@ public static class BooksEndpoints
             await repository.CreateAsync(item);
             return Results.CreatedAtRoute(GetEndpointName, new { id = item.Id }, item);
         })
-        .RequireAuthorization();
+        .RequireAuthorization(policy =>{
+            policy.RequireRole("Admin");
+        });
 
         group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {

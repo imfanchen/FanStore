@@ -32,11 +32,16 @@ dotnet ef migrations add InitialCreation --output-dir Data\Migrations
 dotnet ef database update
 ```
 
-## Add Access Token
+## Use Access Tokens
 ```powershell
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 
+# Create token based authentication
 dotnet user-jwts create
 
+# View the details of JWT's header, payload, and signature
 dotnet user-jwts print <previous-generated-jwt-id>
+
+# Create role based authorization
+dotnet user-jwts create --role "Admin"
 ```
