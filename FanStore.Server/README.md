@@ -43,5 +43,9 @@ dotnet user-jwts create
 dotnet user-jwts print <previous-generated-jwt-id>
 
 # Create role based authorization
-dotnet user-jwts create --role "Admin"
+dotnet user-jwts create --role "admin"
+
+# Create claims based authorization
+dotnet user-jwts create --scope "books:read"
+dotnet user-jwts create --role "admin" --scope "books:write" 
 ```

@@ -1,3 +1,4 @@
+using FanStore.Server.Authorization;
 using FanStore.Server.Entities;
 using FanStore.Server.Models;
 using FanStore.Server.Repositories;
@@ -24,7 +25,7 @@ public static class BooksEndpoints
             return item is not null ? Results.Ok(item.AsDto()) : Results.NotFound();
         })
         .WithName(GetEndpointName)
-        .RequireAuthorization();
+        .RequireAuthorization(Policies.ReadAccess);
 
         group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
         {
@@ -32,9 +33,7 @@ public static class BooksEndpoints
             await repository.CreateAsync(item);
             return Results.CreatedAtRoute(GetEndpointName, new { id = item.Id }, item);
         })
-        .RequireAuthorization(policy =>{
-            policy.RequireRole("Admin");
-        });
+        .RequireAuthorization(Policies.WriteAccess);
 
         group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {
@@ -47,7 +46,7 @@ public static class BooksEndpoints
             await repository.UpdateAsync(existingItem);
             return Results.NoContent();
         })
-        .RequireAuthorization();
+        .RequireAuthorization(Policies.WriteAccess);
 
         group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
         {
@@ -58,7 +57,7 @@ public static class BooksEndpoints
             }
             return Results.NoContent();
         })
-        .RequireAuthorization();
+        .RequireAuthorization(Policies.WriteAccess);
         
         return group;
     }
