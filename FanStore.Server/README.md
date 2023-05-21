@@ -12,3 +12,12 @@ dotnet user-secrets set "ConnectionString:FanStoreContext" "Server=localhost; Da
 
 dotnet user-secrets list
 ```
+
+## Create Database Migration
+```powershell
+dotnet tool install --global dotnet-ef
+
+dotnet add package Microsoft.EntityFrameworkCore.Design
+
+dotnet ef migrations add InitialCreation --output-dir Data\Migrations
+```

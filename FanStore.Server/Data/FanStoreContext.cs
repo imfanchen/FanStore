@@ -1,3 +1,4 @@
+using System.Reflection;
 using FanStore.Server.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,4 +12,10 @@ public class FanStoreContext : DbContext
     }
 
     public DbSet<BookEntity> Books => Set<BookEntity>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Apply IEntityTypeConfiguration<T> within current assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
 }
