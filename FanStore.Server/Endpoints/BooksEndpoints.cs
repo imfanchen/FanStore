@@ -13,39 +13,42 @@ public static class BooksEndpoints
     {
         var group = routes.MapGroup(GroupEndpointName).WithParameterValidation();
 
-        group.MapGet("/", (IBooksRepository repository) => repository.GetAll());
+        group.MapGet("/", async (IBooksRepository repository) => {
+            var allItems = await repository.GetAllAsync();
+            return allItems.Select(item => item.AsDto());
+        });
 
-        group.MapGet("/{id}", (IBooksRepository repository, int id) =>
+        group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
         {
-            BookEntity? item = repository.Get(id);
-            return item is not null ? Results.Ok(item) : Results.NotFound();
+            BookEntity? item = await repository.GetAsync(id);
+            return item is not null ? Results.Ok(item.AsDto()) : Results.NotFound();
         }).WithName(GetEndpointName);
 
-        group.MapPost("/", (IBooksRepository repository, CreatedBookModel createdItem) =>
+        group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
         {
             BookEntity item = createdItem.AsPoco();
-            repository.Create(item);
+            await repository.CreateAsync(item);
             return Results.CreatedAtRoute(GetEndpointName, new { id = item.Id }, item);
         });
 
-        group.MapPut("/{id}", (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
+        group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {
-            BookEntity? existingItem = repository.Get(id);
+            BookEntity? existingItem = await repository.GetAsync(id);
             if (existingItem is null)
             {
                 return Results.NotFound();
             }
             existingItem = updatedItem.AsPoco(id);
-            repository.Update(existingItem);
+            await repository.UpdateAsync(existingItem);
             return Results.NoContent();
         });
 
-        group.MapDelete("/{id}", (IBooksRepository repository, int id) =>
+        group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
         {
-            BookEntity? existingItem = repository.Get(id);
+            BookEntity? existingItem = await repository.GetAsync(id);
             if (existingItem is not null)
             {
-                repository.Delete(id);
+                await repository.DeleteAsync(id);
             }
             return Results.NoContent();
         });

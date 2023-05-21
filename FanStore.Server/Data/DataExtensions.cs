@@ -5,11 +5,11 @@ namespace FanStore.Server.Data;
 
 public static class DataExtensions
 {
-    public static void InitializeDatabase(this IServiceProvider serviceProvider)
+    public static async Task InitializeDatabase(this IServiceProvider serviceProvider)
     {
         using IServiceScope scope = serviceProvider.CreateScope();
         FanStoreContext context = scope.ServiceProvider.GetRequiredService<FanStoreContext>();
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
     }
 
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)

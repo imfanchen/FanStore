@@ -24,32 +24,35 @@ public class InMemoryBooksRepository : IBooksRepository
         },
     };
 
-    public IEnumerable<BookEntity> GetAll()
+    public async Task<IEnumerable<BookEntity>> GetAllAsync()
     {
-        return books;
+        return await Task.FromResult(books);
     }
 
-    public BookEntity? Get(int id)
+    public async Task<BookEntity?> GetAsync(int id)
     {
-        BookEntity? item = books.Find(book => book.Id == id);
-        return item;
+        BookEntity? existingBook = books.Find(book => book.Id == id);
+        return await Task.FromResult(existingBook);
     }
 
-    public void Create(BookEntity createdBook)
+    public async Task CreateAsync(BookEntity createdBook)
     {
         createdBook.Id = books.Max(book => book.Id) + 1;
         books.Add(createdBook);
+        await Task.CompletedTask;
     }
 
-    public void Update(BookEntity updatedBook)
+    public async Task UpdateAsync(BookEntity updatedBook)
     {
         int index = books.FindIndex(book => book.Id == updatedBook.Id);
         books[index] = updatedBook;
+        await Task.CompletedTask;
     }
 
-    public void Delete(int id)
+    public async Task DeleteAsync(int id)
     {
         int index = books.FindIndex(book => book.Id == id);
         books.RemoveAt(index);
+        await Task.CompletedTask;
     }
 }

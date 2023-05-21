@@ -13,30 +13,30 @@ public class EntityFrameworkBooksRepository : IBooksRepository
         this.context = context;
     }
 
-    public IEnumerable<BookEntity> GetAll()
+    public async Task<IEnumerable<BookEntity>> GetAllAsync()
     {
-        return context.Books.AsNoTracking().ToList();
+        return await context.Books.AsNoTracking().ToListAsync();
     }
 
-    public BookEntity? Get(int id)
+    public async Task<BookEntity?> GetAsync(int id)
     {
-        return context.Books.Find(id);
+        return await context.Books.FindAsync(id);
     }
 
-    public void Create(BookEntity createdBook)
+    public async Task CreateAsync(BookEntity createdBook)
     {
         context.Books.Add(createdBook);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
-    public void Update(BookEntity updatedBook)
+    public async Task UpdateAsync(BookEntity updatedBook)
     {
         context.Update(updatedBook);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
-    public void Delete(int id)
+    public async Task DeleteAsync(int id)
     {
-        context.Books.Where(book => book.Id == id).ExecuteDelete();
+        await context.Books.Where(book => book.Id == id).ExecuteDeleteAsync();
     }
 }

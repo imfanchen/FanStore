@@ -4,9 +4,9 @@ namespace FanStore.Server.Repositories;
 
 public interface IBooksRepository
 {
-    void Create(BookEntity createdBook);
-    void Delete(int id);
-    BookEntity? Get(int id);
-    IEnumerable<BookEntity> GetAll();
-    void Update(BookEntity updatedBook);
+    Task<IEnumerable<BookEntity>> GetAllAsync();
+    Task<BookEntity?> GetAsync(int id);
+    Task CreateAsync(BookEntity createdBook);
+    Task UpdateAsync(BookEntity updatedBook);
+    Task DeleteAsync(int id);
 }
