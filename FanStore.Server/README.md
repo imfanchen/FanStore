@@ -8,7 +8,7 @@ Save the connection string to the Secret Manager
 dotnet user-secrets init
 
 $sa_password = "<YOUR-SA-PASSWORD-GOES-HERE>"
-dotnet user-secrets set "ConnectionString:FanStoreContext" "Server=localhost; Database=FanStore; User Id=sa; Password=$sa_password; TrustServiceCertificate=True"
+dotnet user-secrets set "ConnectionString:FanStoreContext" "Server=localhost; Database=FanStore; User Id=sa; Password=$sa_password; TrustServerCertificate=True"
 
 dotnet user-secrets list
 ```
@@ -20,4 +20,9 @@ dotnet tool install --global dotnet-ef
 dotnet add package Microsoft.EntityFrameworkCore.Design
 
 dotnet ef migrations add InitialCreation --output-dir Data\Migrations
+```
+
+## Apply Database Migration
+```powershell
+dotnet ef database update
 ```
