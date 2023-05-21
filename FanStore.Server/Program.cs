@@ -10,6 +10,8 @@ builder.Services.AddSqlServer<FanStoreContext>(connectionString);
 
 WebApplication app = builder.Build();
 
+app.Services.InitializeDatabase();
+
 app.MapBooksEndpoints();
 
 app.Run();
