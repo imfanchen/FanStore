@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FanStore.Server.Authorization;
 using FanStore.Server.Entities;
 using FanStore.Server.Models;
@@ -14,9 +15,30 @@ public static class BooksEndpoints
     {
         var group = routes.MapGroup(GroupEndpointName).WithParameterValidation();
 
-        group.MapGet("/", async (IBooksRepository repository) => {
-            var allItems = await repository.GetAllAsync();
-            return allItems.Select(item => item.AsDto());
+        group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) => {
+            try
+            {
+                IEnumerable<BookEntity> items = await repository.GetAllAsync();
+                IEnumerable<BookModel> records = items.Select(item => item.AsDto());
+                return Results.Ok(records);
+            }
+            catch (Exception ex)
+            {
+                var logger = loggerFactory.CreateLogger("Books Endpoints");
+                logger.LogError(ex, 
+                    "Could not process a request on machine {Machine}. TraceId: {TraceId}",
+                    Environment.MachineName,
+                    Activity.Current?.TraceId
+                );
+                return Results.Problem(
+                    title: "We made a mistake but we're working on it!",
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    extensions: new Dictionary<string, object?>
+                    {
+                        {"traceId", Activity.Current?.TraceId.ToString()}
+                    }
+                );
+            }
         });
 
         group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
