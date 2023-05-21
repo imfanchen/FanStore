@@ -39,5 +39,4 @@ public class EntityFrameworkBooksRepository : IBooksRepository
     {
         context.Books.Where(book => book.Id == id).ExecuteDelete();
     }
-
 }
