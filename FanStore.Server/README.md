@@ -39,13 +39,24 @@ dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 # Create token based authentication
 dotnet user-jwts create
 
-# View the details of JWT's header, payload, and signature
-dotnet user-jwts print <previous-generated-jwt-id>
+# View all the existing json web tokens
+dotnet user-jwts list
+
+# View the token's header, payload, and signature
+dotnet user-jwts print <your-jwt-id>
 
 # Create role based authorization
 dotnet user-jwts create --role "admin"
 
 # Create claims based authorization
 dotnet user-jwts create --scope "books:read"
+
+# Create authorization with a role and a resource permission
 dotnet user-jwts create --role "admin" --scope "books:write" 
+
+# Remove a specific token
+dotnet user-jwts remove <your-jwt-id>
+
+# Delete all the existing json web tokens
+dotnet user-jwts clear
 ```

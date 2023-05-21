@@ -7,10 +7,14 @@ namespace FanStore.Server.Repositories;
 public class EntityFrameworkBooksRepository : IBooksRepository
 {
     private readonly FanStoreContext context;
+    private readonly ILogger<EntityFrameworkBooksRepository> logger;
 
-    public EntityFrameworkBooksRepository(FanStoreContext context)
+    public EntityFrameworkBooksRepository(
+        FanStoreContext context, 
+        ILogger<EntityFrameworkBooksRepository> logger)
     {
         this.context = context;
+        this.logger = logger;
     }
 
     public async Task<IEnumerable<BookEntity>> GetAllAsync()
@@ -27,6 +31,7 @@ public class EntityFrameworkBooksRepository : IBooksRepository
     {
         context.Books.Add(createdBook);
         await context.SaveChangesAsync();
+        logger.LogInformation($"create book {createdBook.Name} with price {createdBook.Price}");
     }
 
     public async Task UpdateAsync(BookEntity updatedBook)
