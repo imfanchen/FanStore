@@ -20,6 +20,7 @@ WebApplication app = builder.Build();
 
 await app.Services.InitializeDatabase();
 
+app.UseHttpLogging();
 app.MapBooksEndpoints();
 
 app.Run();
