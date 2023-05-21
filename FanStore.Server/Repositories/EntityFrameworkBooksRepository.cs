@@ -31,7 +31,7 @@ public class EntityFrameworkBooksRepository : IBooksRepository
     {
         context.Books.Add(createdBook);
         await context.SaveChangesAsync();
-        logger.LogInformation($"Create book {createdBook.Name} with price {createdBook.Price}.");
+        logger.LogInformation("Create book {Name} with price {Price}.", createdBook.Name, createdBook.Price);
     }
 
     public async Task UpdateAsync(BookEntity updatedBook)
