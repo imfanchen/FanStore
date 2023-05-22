@@ -2,7 +2,7 @@ namespace FanStore.Server.Authorization;
 
 public static class AuthorizationExtensions
 {
-    public static IServiceCollection AddClaimBasedAuthorization(this IServiceCollection services)
+    public static IServiceCollection AddAuthorizationService(this IServiceCollection services)
     {
         services.AddAuthorization(options =>
         {
