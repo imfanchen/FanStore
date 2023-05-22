@@ -9,6 +9,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddAuthentication().AddJwtBearer();
 builder.Services.AddClaimBasedAuthorization();
+builder.Services.AddApiVersioning();
 
 builder.Logging.AddJsonConsole(options =>
 {

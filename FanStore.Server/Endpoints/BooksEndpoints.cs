@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FanStore.Server.Authorization;
 using FanStore.Server.Entities;
 using FanStore.Server.Models;
@@ -14,46 +13,55 @@ public static class BooksEndpoints
 
     public static RouteGroupBuilder MapBooksEndpoints(this IEndpointRouteBuilder routes)
     {
-        RouteGroupBuilder v1Group = routes.MapGroup("/v1" + GroupEndpointName).WithParameterValidation();
-        RouteGroupBuilder v2Group = routes.MapGroup("/v2" + GroupEndpointName).WithParameterValidation();
+        RouteGroupBuilder group = routes
+            .NewVersionedApi()
+            .MapGroup("/v{version:apiVersion}" + GroupEndpointName)
+            .HasApiVersion(1.0)
+            .HasApiVersion(2.0)
+            .WithParameterValidation();
 
-        v1Group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) =>
+        group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) =>
         {
             IEnumerable<BookEntity> items = await repository.GetAllAsync();
             return Results.Ok(items.Select(item => item.AsDtoV1()));
-        });
+        })
+        .MapToApiVersion(1.0);
 
-        v1Group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
+        group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
         {
             BookEntity? item = await repository.GetAsync(id);
             return item is not null ? Results.Ok(item.AsDtoV1()) : Results.NotFound();
         })
         .WithName(GetV1EndpointName)
-        .RequireAuthorization(Policies.ReadAccess);
+        .RequireAuthorization(Policies.ReadAccess)
+        .MapToApiVersion(1.0);
 
-        v2Group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) =>
+        group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) =>
         {
             IEnumerable<BookEntity> items = await repository.GetAllAsync();
             return Results.Ok(items.Select(item => item.AsDtoV2(0.3m)));
-        });
+        })
+        .MapToApiVersion(2.0);
 
-        v2Group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
+        group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
         {
             BookEntity? item = await repository.GetAsync(id);
             return item is not null ? Results.Ok(item.AsDtoV2(0.3m)) : Results.NotFound();
         })
         .WithName(GetV2EndpointName)
-        .RequireAuthorization(Policies.ReadAccess);
+        .RequireAuthorization(Policies.ReadAccess)
+        .MapToApiVersion(2.0);
 
-        v1Group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
+        group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
         {
             BookEntity item = createdItem.AsPoco();
             await repository.CreateAsync(item);
             return Results.CreatedAtRoute(GetV1EndpointName, new { id = item.Id }, item);
         })
-        .RequireAuthorization(Policies.WriteAccess);
+        .RequireAuthorization(Policies.WriteAccess)
+        .MapToApiVersion(1.0);
 
-        v1Group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
+        group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {
             BookEntity? existingItem = await repository.GetAsync(id);
             if (existingItem is null)
@@ -64,9 +72,10 @@ public static class BooksEndpoints
             await repository.UpdateAsync(existingItem);
             return Results.NoContent();
         })
-        .RequireAuthorization(Policies.WriteAccess);
+        .RequireAuthorization(Policies.WriteAccess)
+        .MapToApiVersion(1.0);
 
-        v1Group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
+        group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
         {
             BookEntity? existingItem = await repository.GetAsync(id);
             if (existingItem is not null)
@@ -75,8 +84,9 @@ public static class BooksEndpoints
             }
             return Results.NoContent();
         })
-        .RequireAuthorization(Policies.WriteAccess);
+        .RequireAuthorization(Policies.WriteAccess)
+        .MapToApiVersion(1.0);
 
-        return v1Group;
+        return group;
     }
 }
