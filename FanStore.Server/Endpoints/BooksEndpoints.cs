@@ -15,7 +15,7 @@ public static class BooksEndpoints
     {
         RouteGroupBuilder group = routes
             .NewVersionedApi()
-            .MapGroup("/v{version:apiVersion}" + GroupEndpointName)
+            .MapGroup(GroupEndpointName)
             .HasApiVersion(1.0)
             .HasApiVersion(2.0)
             .WithParameterValidation();
