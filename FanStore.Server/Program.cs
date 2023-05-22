@@ -23,6 +23,16 @@ builder.Logging.AddJsonConsole(options =>
     };
 });
 
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(corsBuilder => {
+        string allowedOrigin = builder.Configuration["AllowedOrigin"] ??
+            throw new InvalidOperationException("Allowed Origin is not set.");
+        corsBuilder.WithOrigins(allowedOrigin)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 WebApplication app = builder.Build();
 
 app.UseExceptionHandler(configure => configure.ConfigureExceptionHandler());
@@ -32,5 +42,6 @@ await app.Services.InitializeDatabase();
 
 app.UseHttpLogging();
 app.MapBooksEndpoints();
+app.UseCors();
 
 app.Run();
