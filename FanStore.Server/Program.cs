@@ -1,7 +1,7 @@
-using System.Diagnostics;
 using FanStore.Server.Authorization;
 using FanStore.Server.Data;
 using FanStore.Server.Endpoints;
+using FanStore.Server.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -19,25 +19,7 @@ builder.Logging.AddJsonConsole(options =>
 
 WebApplication app = builder.Build();
 
-app.Use(async (context, next) => 
-{
-    Stopwatch stopWatch = new();
-    try
-    {
-        stopWatch.Start();
-        await next(context);
-    }
-    finally
-    {    
-        stopWatch.Stop();
-        long elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
-        app.Logger.LogInformation(
-            "{RequestMethod} {RequestPath} request took {ElapsedMilliseconds}ms to complete",
-            context.Request.Method,
-            context.Request.Path,
-            elapsedMilliseconds);
-    }
-});
+app.UseMiddleware<RequestTimingMiddleware>();
 
 await app.Services.InitializeDatabase();
 
