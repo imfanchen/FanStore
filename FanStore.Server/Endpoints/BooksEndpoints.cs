@@ -9,34 +9,51 @@ namespace FanStore.Server.Endpoints;
 public static class BooksEndpoints
 {
     const string GroupEndpointName = "/books";
-    const string GetEndpointName = "GetBook";
+    const string GetV1EndpointName = "GetBookV1";
+    const string GetV2EndpointName = "GetBookV2";
 
     public static RouteGroupBuilder MapBooksEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup(GroupEndpointName).WithParameterValidation();
+        RouteGroupBuilder v1Group = routes.MapGroup("/v1" + GroupEndpointName).WithParameterValidation();
+        RouteGroupBuilder v2Group = routes.MapGroup("/v2" + GroupEndpointName).WithParameterValidation();
 
-        group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) => {
+        v1Group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) =>
+        {
             IEnumerable<BookEntity> items = await repository.GetAllAsync();
-            return Results.Ok(items.Select(item => item.AsDto()));
+            return Results.Ok(items.Select(item => item.AsDtoV1()));
         });
 
-        group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
+        v1Group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
         {
             BookEntity? item = await repository.GetAsync(id);
-            return item is not null ? Results.Ok(item.AsDto()) : Results.NotFound();
+            return item is not null ? Results.Ok(item.AsDtoV1()) : Results.NotFound();
         })
-        .WithName(GetEndpointName)
+        .WithName(GetV1EndpointName)
         .RequireAuthorization(Policies.ReadAccess);
 
-        group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
+        v2Group.MapGet("/", async (IBooksRepository repository, ILoggerFactory loggerFactory) =>
+        {
+            IEnumerable<BookEntity> items = await repository.GetAllAsync();
+            return Results.Ok(items.Select(item => item.AsDtoV2(0.3m)));
+        });
+
+        v2Group.MapGet("/{id}", async (IBooksRepository repository, int id) =>
+        {
+            BookEntity? item = await repository.GetAsync(id);
+            return item is not null ? Results.Ok(item.AsDtoV2(0.3m)) : Results.NotFound();
+        })
+        .WithName(GetV2EndpointName)
+        .RequireAuthorization(Policies.ReadAccess);
+
+        v1Group.MapPost("/", async (IBooksRepository repository, CreatedBookModel createdItem) =>
         {
             BookEntity item = createdItem.AsPoco();
             await repository.CreateAsync(item);
-            return Results.CreatedAtRoute(GetEndpointName, new { id = item.Id }, item);
+            return Results.CreatedAtRoute(GetV1EndpointName, new { id = item.Id }, item);
         })
         .RequireAuthorization(Policies.WriteAccess);
 
-        group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
+        v1Group.MapPut("/{id}", async (IBooksRepository repository, int id, UpdatedBookModel updatedItem) =>
         {
             BookEntity? existingItem = await repository.GetAsync(id);
             if (existingItem is null)
@@ -49,7 +66,7 @@ public static class BooksEndpoints
         })
         .RequireAuthorization(Policies.WriteAccess);
 
-        group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
+        v1Group.MapDelete("/{id}", async (IBooksRepository repository, int id) =>
         {
             BookEntity? existingItem = await repository.GetAsync(id);
             if (existingItem is not null)
@@ -59,7 +76,7 @@ public static class BooksEndpoints
             return Results.NoContent();
         })
         .RequireAuthorization(Policies.WriteAccess);
-        
-        return group;
+
+        return v1Group;
     }
 }

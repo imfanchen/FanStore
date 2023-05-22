@@ -2,11 +2,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FanStore.Server.Models;
 
-public record BookModel(
+public record BookModelV1(
     int Id,
     string Name,
     string Author,
     decimal Price,
+    DateTime ReleaseDate,
+    string ImageUri
+);
+
+public record BookModelV2(
+    int Id,
+    string Name,
+    string Author,
+    decimal Price,
+    decimal RetailPrice,
     DateTime ReleaseDate,
     string ImageUri
 );

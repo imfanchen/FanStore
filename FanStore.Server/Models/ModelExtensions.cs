@@ -5,7 +5,7 @@ namespace FanStore.Server.Models;
 // Extension methods to map Plain Old C# Object (POCOs) to Data Transfer Objects (DTOs)
 public static class ModelExtensions
 {
-    public static BookEntity AsPoco(this BookModel item)
+    public static BookEntity AsPoco(this BookModelV1 item)
     {
         return new BookEntity()
         {
