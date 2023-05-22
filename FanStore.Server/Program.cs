@@ -1,6 +1,7 @@
 using FanStore.Server.Authorization;
 using FanStore.Server.Data;
 using FanStore.Server.Endpoints;
+using FanStore.Server.ErrorHandling;
 using FanStore.Server.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Logging.AddJsonConsole(options =>
 
 WebApplication app = builder.Build();
 
+app.UseExceptionHandler(configure => configure.ConfigureExceptionHandler());
 app.UseMiddleware<RequestTimingMiddleware>();
 
 await app.Services.InitializeDatabase();
